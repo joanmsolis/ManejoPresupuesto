@@ -9,12 +9,22 @@ namespace ManejoPresupuesto.Controllers
     public class TiposCuentasController: Controller
     {
         private readonly IRepositorioTiposCuentas repositorioTiposCuentas;
-       
-        public TiposCuentasController(IRepositorioTiposCuentas repositorioTiposCuentas)
+        private readonly IServiciosUsuarios serviciosUsuarios;
+
+        public TiposCuentasController(IRepositorioTiposCuentas repositorioTiposCuentas,
+            IServiciosUsuarios serviciosUsuarios)
         {
             this.repositorioTiposCuentas = repositorioTiposCuentas;
-                
+            this.serviciosUsuarios = serviciosUsuarios;
         }
+
+        public async Task<IActionResult> Index()
+        {
+            var usuarioId = serviciosUsuarios.ObtenerUsuasriosId();
+            var tiposCuentas = await repositorioTiposCuentas.Obtener(usuarioId);
+            return View(tiposCuentas);
+        }
+
         public IActionResult Crear()
         {
 
@@ -36,7 +46,19 @@ namespace ManejoPresupuesto.Controllers
                 return View(tiposCuentas);
             }
             repositorioTiposCuentas.Crear(tiposCuentas);
-            return View();
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public async Task<IActionResult> verificarExisteTipoCuenta(string nombre)
+        {
+            var usuarioId = serviciosUsuarios.ObtenerUsuasriosId();
+            var yaExisteTipoCuenta = await repositorioTiposCuentas.existe(nombre, usuarioId);
+
+            if (yaExisteTipoCuenta)
+            {
+                return Json($"El nombre {nombre} ya existe");
+            }
+            return Json(true);
         }
     }
 }
