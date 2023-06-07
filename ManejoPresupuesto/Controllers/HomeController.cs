@@ -17,6 +17,9 @@ namespace ManejoPresupuesto.Controllers
         {
             return View();
         }
+        public IActionResult NoEncotrado() { 
+             return View();
+        }
 
         public IActionResult Privacy()
         {
